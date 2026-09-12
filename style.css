@@ -41,3 +41,5 @@
 #map-status{position:absolute;top:55px;left:12px;right:12px;z-index:3;background:#fff8e9;color:#826126;border:1px solid #efd79e;padding:10px 12px;border-radius:7px;font-size:11px;line-height:1.6}
 #map-status a{color:#087af5}
 @media(max-width:600px){#map{width:100%;margin:0}.map-caption{font-size:6px;max-width:calc(100% - 65px)}.leaflet-control-attribution{font-size:8px!important}}
+
+.coordinate-tools{padding:0 20px 14px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}.coordinate-tools label{cursor:pointer}.coordinate-tools p{flex-basis:100%;font-size:12px;color:#61758e;margin:0}.coordinate-tools .text-button{white-space:normal;text-align:left}

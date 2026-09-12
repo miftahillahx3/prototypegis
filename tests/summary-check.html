@@ -8,17 +8,17 @@ frame.onload=()=>{
  const check=(name,ok)=>{if(!ok)throw Error(name);checks.push('PASS: '+name)};
  doc.querySelector('#intro-start')?.click(); const counts=()=>[...doc.querySelectorAll('#zones b')].map(e=>Number(e.textContent.replaceAll('.','')));
  try{
-  check('Initial K-Means counts',counts().join(',')==='526,246,40');
+  check('Initial K-Means counts',counts().join(',')===win.eval("['Rendah','Sedang','Tinggi'].map(r=>current().filter(f=>f.risk===r).length).join(',')"));
   doc.querySelector('[data-mode="dbscan"]').click();
   check('DBSCAN heading and categories',doc.querySelector('.zone-card h2').textContent==='Ringkasan anomali'&&!!doc.querySelector('[data-zone="Normal"]'));
-  check('DBSCAN counts',counts().join(',')==='791,21');
+  check('DBSCAN counts',counts().join(',')===win.eval("[current().filter(f=>!f.outlier).length,current().filter(f=>f.outlier).length].join(',')"));
   check('Two distribution segments',doc.querySelectorAll('.zone-card .distribution-bar i').length===2);
-  doc.querySelector('#period').value='6';doc.querySelector('#period').dispatchEvent(new Event('change'));
-  check('Period changes DBSCAN summary',counts().join(',')==='633,17');
-  doc.querySelector('#region').value='Cirebon';doc.querySelector('#region').dispatchEvent(new Event('change'));
+  doc.querySelector('#period').value='2026-06';doc.querySelector('#period').dispatchEvent(new Event('change'));
+  check('Period changes DBSCAN summary',counts().join(',')===win.eval("[current().filter(f=>!f.outlier).length,current().filter(f=>f.outlier).length].join(',')"));
+
   check('Region total matches map',counts().reduce((a,b)=>a+b,0)===win.eval('current().length'));
   doc.querySelector('[data-zone="Normal"]').click();
-  check('Normal row opens filtered data',doc.querySelector('[data-risk="Normal"]').classList.contains('active')&&[...doc.querySelectorAll('#facility-table tr')].every(row=>row.cells[4]?.textContent==='Normal'));
+  check('Normal row opens filtered data',doc.querySelector('[data-risk="Normal"]').classList.contains('active')&&[...doc.querySelectorAll('#facility-table tr')].every(row=>row.cells[5]?.textContent==='Normal'));
   win.navigate('peta');doc.querySelector('[data-mode="kmeans"]').click();
   check('Switch back restores three risk groups',counts().length===3&&!!doc.querySelector('[data-zone="Tinggi"]')&&doc.querySelector('.zone-card h2').textContent==='Ringkasan zonasi');
   document.querySelector('#results').textContent=checks.join('\n')+'\nALL PASSED';

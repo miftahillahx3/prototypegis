@@ -1,0 +1,61 @@
+<!doctype html><meta charset="utf-8"><pre id="results">RUNNING</pre><script src="../clustering.js"></script><iframe src="../index.html"></iframe><script>
+const checks=[];function check(name,ok){if(!ok)throw Error(name);checks.push('PASS '+name)}
+try{
+const km=Clustering.kmeans([0,0,1,10,10,11,30,30,31]);check('Known separated clusters',km.labels.join()==='0,0,0,1,1,1,2,2,2');
+check('DBSCAN border promotion',Clustering.dbscan([0,.2,.3,.4,10],.21,3).join()==='0,0,0,0,-1');
+check('DBSCAN uses all dimensions',Clustering.dbscan([[0,0],[0,10],[0,20]],.8,3).every(v=>v===-1));
+check('Population zscore',JSON.stringify(Clustering.standardize([[1,4],[3,4]]).values)==='[[-1,0],[1,0]]');
+check('One cluster silhouette undefined',Clustering.silhouette([2,2],[0,0])===null);
+check('Known silhouette',Clustering.silhouette([[0,0],[0,0],[10,10],[10,10]],[0,0,1,1])===1);
+check('Constant data',Clustering.kmeans([2,2,2]).centers.length===1);
+}catch(e){checks.push('FAIL '+e.message)}
+document.querySelector('iframe').onload=async()=>{try{
+const w=document.querySelector('iframe').contentWindow,d=w.document;
+check('91 real facilities',w.eval('facilities.length')===91);
+check('418 real samples',w.eval('facilities.reduce((n,f)=>n+f.samples,0)')===418);
+check('Maximum TSH 14',w.eval('Math.max(...facilities.map(f=>f.tsh))')===14);
+check('375 validated samples',w.eval('facilities.reduce((n,f)=>n+(f.statuses.Validated||0),0)')===375);
+check('Histogram contains all samples',w.eval('facilities.reduce((n,f)=>n+f.bins.reduce((a,b)=>a+b,0),0)')===418);
+check('39 referenced names, remaining unlocated',w.eval('facilities.filter(f=>Number.isFinite(f.lat)).length===39 && facilities.filter(f=>f.lat===null).length===52'));
+check('All coordinates have public provenance',w.eval('facilities.filter(f=>Number.isFinite(f.lat)).every(f=>f.sourceUrl.startsWith("https://")&&f.sourceTitle&&f.note)'));
+check('Aliases share 31 physical markers',w.eval('markerLayer.getLayers().length')===31);
+w.eval('markerLayer.getLayers().find(m=>m.getLatLng().lat===-6.80997).fire("click")');check('Colocated aliases remain selectable',d.querySelectorAll('#dialog-content [data-id]').length===5);d.querySelector('#detail-dialog').close();
+check('Coverage explained',d.querySelector('#coordinate-note').textContent.includes('39/91'));
+w.eval('showDetail(facilities[0].id)');check('All research variables explained',d.querySelector('#dialog-content').textContent.includes('z-score'));
+d.querySelector('#detail-dialog').close();w.navigate('data');
+check('Table includes mean and max',d.querySelector('#facility-table tr').cells.length===7);
+const baseline=w.eval('JSON.stringify(facilities.map(f=>[f.id,f.cluster,f.outlier]))');
+for(const month of ['2026-06','2026-07','2026-08']){
+ d.querySelector('#period').value=month;d.querySelector('#period').dispatchEvent(new w.Event('change'));
+ check('Monthly aggregation '+month,w.eval('facilities.reduce((s,f)=>s+f.samples,0)===selectedAggregates().reduce((s,f)=>s+f.samples,0)'));
+ check('Finite monthly model '+month,w.eval('facilities.every(f=>f.centroid.every(Number.isFinite))'));
+}
+d.querySelector('#period').value='all';d.querySelector('#period').dispatchEvent(new w.Event('change'));
+check('Reproducible all-period result',baseline===w.eval('JSON.stringify(facilities.map(f=>[f.id,f.cluster,f.outlier]))'));
+w.eval("mode='dbscan';renderMap()");check('Summary totals 91',[...d.querySelectorAll('#zones b')].reduce((s,e)=>s+Number(e.textContent),0)===91);
+let exported;w.URL.createObjectURL=blob=>{exported=blob;return 'blob:test'};w.HTMLAnchorElement.prototype.click=function(){};d.querySelector('#export').click();
+const csv=await exported.text();check('CSV includes mean TSH',csv.includes('TSH rata-rata'));
+check('CSV has 91 facilities',csv.split('\\r\\n').length===92 || csv.split('\r\n').length===92);
+const name=w.eval('sourceNames[0]');
+const csvCoordinates='nama_fasyankes,wilayah,latitude,longitude\n"'+name.replaceAll('"','""')+'",Kota contoh,-6.9,107.6';
+check('Coordinate CSV matches facility',w.parseCoordinateCSV(csvCoordinates).get(name).lat===-6.9);
+let rejected=false;try{w.parseCoordinateCSV(csvCoordinates.replace('-6.9','-96.9'));}catch(e){rejected=true}check('Invalid latitude rejected',rejected);
+rejected=false;try{w.parseCoordinateCSV(csvCoordinates.replace(name,'Fasyankes tidak dikenal'));}catch(e){rejected=true}check('Unknown facility rejected',rejected);
+check('HTML escaping',w.eval('escapeHTML("<script>")')==='&lt;script&gt;');
+w.L.tileLayer=()=>w.L.layerGroup();
+w.navigate('peta');
+await d.querySelector('#coordinate-file').onchange({target:{files:[new w.File([csvCoordinates],'coordinates.csv')],value:'coordinates.csv'}});
+check('Coordinate import retains reference markers',w.eval('markerLayer.getLayers().length')===32);
+check('Partial import count shown',d.querySelector('#coordinate-note').textContent.includes('39/91'));
+d.querySelector('#region').value='Kota contoh';d.querySelector('#region').dispatchEvent(new w.Event('change'));
+check('Region filters facilities',w.eval('current().length')===1);
+check('Region does not retrain model on subset',w.eval('activeAnalysis.labels.length')===91);
+d.querySelector('#region').value='all';d.querySelector('#region').dispatchEvent(new w.Event('change'));
+const frame=document.querySelector('iframe');frame.style.width='390px';frame.style.height='844px';
+w.navigate('beranda');await new Promise(r=>setTimeout(r,100));
+check('Mobile dashboard no page overflow',d.documentElement.scrollWidth<=d.documentElement.clientWidth);
+w.methodology();check('Mobile method dialog fits',d.querySelector('#intro-dialog').getBoundingClientRect().width<=390);
+d.querySelector('#intro-close').click();
+checks.push('METRICS '+w.eval('JSON.stringify({counts:["Rendah","Sedang","Tinggi"].map(r=>facilities.filter(f=>f.risk===r).length),silhouette:activeAnalysis.silhouette,outliers:activeAnalysis.outliers,dbscanClusters:activeAnalysis.dbscanClusters,dbscanSilhouette:activeAnalysis.dbscanSilhouette,inertia:activeAnalysis.inertia,centers:activeAnalysis.centers,normalization:activeAnalysis.normalization,labels:activeAnalysis.labels})'));
+}catch(e){checks.push('FAIL '+e.stack)}document.querySelector('#results').textContent=checks.join('\n');};
+</script>

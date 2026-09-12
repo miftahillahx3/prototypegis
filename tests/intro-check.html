@@ -10,8 +10,8 @@ frame.onload=async()=>{
   let intro=doc.querySelector('#intro-dialog');
   if(phase===0){
    check('First visit opens dashboard without introduction',!intro?.open); doc.querySelector('#info-button').click(); intro=doc.querySelector('#intro-dialog');
-   check('Both algorithms and rationale shown',intro.textContent.includes('K-Means')&&intro.textContent.includes('DBSCAN')&&intro.textContent.includes('fasilitas dan wilayah yang perlu ditinjau lebih lanjut'));
-   check('Simulation explained',intro.textContent.includes('belum menjalankan algoritma'));
+   check('Both algorithms and rationale shown',intro.textContent.includes('K-Means')&&intro.textContent.includes('DBSCAN')&&intro.textContent.includes('koordinat fasyankes terverifikasi'));
+   check('Research parameters explained',intro.textContent.includes('minPts=3')&&intro.textContent.includes('418'));
    check('Accessible title receives focus',doc.activeElement.id==='intro-title');
    check('Mobile dialog fits viewport',intro.getBoundingClientRect().width<=390&&intro.scrollWidth<=intro.clientWidth);
    doc.querySelector('#intro-start').click();await new Promise(r=>setTimeout(r,50));

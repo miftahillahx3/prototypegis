@@ -20,7 +20,7 @@ Aplikasi ini adalah situs statis. Tidak memerlukan Node.js, backend, atau API ke
 
 1. Masuk ke GitHub dan buka repositori Anda: https://github.com/miftahillahx3/prototypegis. Repositori ini sudah Public.
 2. Ekstrak `sbbl-jawa-barat-github.zip` di komputer. Jangan unggah ZIP-nya sebagai aplikasi.
-3. Buka https://github.com/miftahillahx3/prototypegis/upload/main (atau pilih **uploading an existing file** pada halaman repositori kosong). Unggah **isi** hasil ekstraksi: `index.html`, `style.css`, `app.js`, `.nojekyll`, `README.md`, `PUBLISH.md`, serta folder `vendor`. Pastikan `index.html` langsung di root repositori dan struktur folder `vendor/leaflet` tetap sama.
+3. Buka https://github.com/miftahillahx3/prototypegis/upload/main (atau pilih **uploading an existing file** pada halaman repositori kosong). Unggah **isi** hasil ekstraksi: `index.html`, `style.css`, `app.js`, `clustering.js`, `research-data.js`, `coordinates.js`, `facility-locations.js`, `facility-location-audit.csv`, `LOCATIONS.md`, `.nojekyll`, `README.md`, `RESEARCH.md`, `PUBLISH.md`, serta folder `vendor`. Pastikan `index.html` langsung di root repositori dan struktur folder `vendor/leaflet` tetap sama.
 4. Pilih **Commit changes** ke branch `main`.
 5. Buka https://github.com/miftahillahx3/prototypegis/settings/pages (**Settings → Pages → Build and deployment**). Pilih **Deploy from a branch**, branch **main**, folder **/(root)**, kemudian **Save**.
 6. Tunggu deployment selesai. Buka URL yang ditampilkan pada halaman Settings → Pages. URL proyek ini setelah deployment berhasil: https://miftahillahx3.github.io/prototypegis/. GitHub Pages telah dikonfigurasi untuk branch main dan folder root. Setelah push, tunggu deployment selesai sebelum memeriksa versi terbaru.
@@ -41,6 +41,6 @@ Di folder proyek lokal, jalankan `powershell -ExecutionPolicy Bypass -File .\pre
 
 ## Deskripsi portofolio
 
-> SBBL Jawa Barat — prototipe dashboard penelitian kerentanan neonatal yang responsif, dengan peta geografis interaktif, eksplorasi kategori K-Means/DBSCAN, statistik, pencarian fasilitas kesehatan, serta ekspor CSV. Dibangun menggunakan HTML, CSS, JavaScript, dan Leaflet. Menggunakan data sintetis untuk demonstrasi; belum menjalankan algoritma clustering pada data penelitian nyata.
+> SBBL Jawa Barat — prototipe dashboard penelitian kerentanan neonatal yang responsif, dengan peta geografis interaktif, eksplorasi kategori K-Means/DBSCAN, statistik, pencarian fasilitas kesehatan, serta ekspor CSV. Dibangun menggunakan HTML, CSS, JavaScript, dan Leaflet. Menjalankan K-Means dan DBSCAN pada agregat data penelitian. Paket lokal memuat agregat 418 pemeriksaan dari 91 fasyankes; file sumber dan identitas pasien tidak disertakan. Koordinat fasyankes dapat dimuat melalui CSV lokal.
 
 Dokumentasi resmi: https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site
