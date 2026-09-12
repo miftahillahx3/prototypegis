@@ -9,7 +9,7 @@ frame.onload=async()=>{
   try{
     const win=frame.contentWindow,doc=win.document;
     await wait();
-    const map=win.eval('geoMap');
+    doc.querySelector('#intro-start')?.click(); const map=win.eval('geoMap');
     check('Leaflet initialized',!!map);
     map.options.zoomAnimation=false;
     const initial=map.getZoom();

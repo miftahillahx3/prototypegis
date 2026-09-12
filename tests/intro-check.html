@@ -1,0 +1,29 @@
+<!doctype html><meta charset="utf-8"><title>Introduction regression</title><pre id="results">RUNNING</pre><iframe id="app" style="width:390px;height:844px"></iframe>
+<script>
+const frame=document.querySelector('#app'),result=document.querySelector('#results'),checks=[];
+const check=(name,ok)=>{if(!ok)throw Error(name);checks.push('PASS: '+name)};
+let phase=0,source='';
+localStorage.removeItem('sbbl-methodology-intro-v1');
+frame.onload=async()=>{
+ const doc=frame.contentDocument;if(!doc.querySelector('#stats'))return;
+ try{
+  const intro=doc.querySelector('#intro-dialog');
+  if(phase===0){
+   check('First visit opens introduction',intro?.open);
+   check('Both algorithms and rationale shown',intro.textContent.includes('K-Means')&&intro.textContent.includes('DBSCAN')&&intro.textContent.includes('Mengapa dipakai bersama?'));
+   check('Simulation explained',intro.textContent.includes('belum menjalankan algoritma'));
+   check('Accessible title receives focus',doc.activeElement.id==='intro-title');
+   check('Mobile dialog fits viewport',intro.getBoundingClientRect().width<=390&&intro.scrollWidth<=intro.clientWidth);
+   doc.querySelector('#intro-start').click();await new Promise(r=>setTimeout(r,50));
+   check('Start closes and remembers visit',!intro.open&&localStorage.getItem('sbbl-methodology-intro-v1')==='seen');
+   phase=1;frame.srcdoc=source;
+  }else{
+   check('Returning visit does not open dialog',!intro?.open);
+   doc.querySelector('#info-button').click();check('Information button reopens dialog',doc.querySelector('#intro-dialog').open);
+   doc.querySelector('#intro-close').click();doc.querySelector('#method').click();check('Methodology button reopens dialog',doc.querySelector('#intro-dialog').open);
+   result.textContent=checks.join('\n')+'\nALL PASSED';
+  }
+ }catch(e){result.textContent=checks.join('\n')+'\nFAIL: '+e.message}
+};
+fetch('../index.html').then(r=>r.text()).then(html=>{source=html.replace('<head>','<head><base href="http://localhost:8080/">').replace('<script src="app.js">','<script>L.tileLayer=()=>L.layerGroup();<\/script><script src="app.js">');frame.srcdoc=source});
+</script>

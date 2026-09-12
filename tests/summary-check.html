@@ -6,7 +6,7 @@ frame.onload=()=>{
  const win=frame.contentWindow,doc=win.document,checks=[];
  if(!doc.querySelector('#zones'))return;
  const check=(name,ok)=>{if(!ok)throw Error(name);checks.push('PASS: '+name)};
- const counts=()=>[...doc.querySelectorAll('#zones b')].map(e=>Number(e.textContent.replaceAll('.','')));
+ doc.querySelector('#intro-start')?.click(); const counts=()=>[...doc.querySelectorAll('#zones b')].map(e=>Number(e.textContent.replaceAll('.','')));
  try{
   check('Initial K-Means counts',counts().join(',')==='526,246,40');
   doc.querySelector('[data-mode="dbscan"]').click();
