@@ -94,7 +94,7 @@ function renderTable(){const q=$('#search').value.toLowerCase(),list=current().f
 function bindDetails(){$$('[data-id]').forEach(b=>{b.onclick=()=>showDetail(Number(b.dataset.id));b.onkeydown=e=>{if(e.key==='Enter')b.click()}})}
 function showDialog(html){$('#dialog-content').innerHTML=html;if(!$('#detail-dialog').open)$('#detail-dialog').showModal()}
 function showDetail(id){const f=facilities[id];showDialog(`<span class="eyebrow">PROFIL FASYANKES · SIMULASI</span><h2>${f.name}</h2><p>${f.area}, Jawa Barat</p>${badge(f.risk)}<div class="detail-box"><strong>Ringkasan pemeriksaan</strong><div class="detail-line"><span>Total sampel</span><strong>${f.samples}</strong></div><div class="detail-line"><span>Nilai TSH tertinggi</span><strong>${f.tsh.toFixed(1).replace('.',',')} µIU/mL</strong></div><div class="detail-line"><span>Pola data (DBSCAN)</span><strong>${f.outlier?'Outlier':'Normal'}</strong></div></div><div class="detail-box"><strong>Catatan penelitian</strong><p>${f.risk==='Tinggi'?'Dalam contoh ini, fasilitas masuk kelompok risiko tinggi. Artinya, kelompok ini dimaksudkan memiliki indikator kerentanan relatif lebih tinggi. Dasar indikator belum ditetapkan; label ini bukan hasil penilaian medis.':'Kategori risiko adalah nama kelompok dalam data contoh. Penilaian sebenarnya memerlukan indikator penelitian yang sudah ditetapkan.'} ${f.outlier?'Outlier berarti pola data berbeda dan perlu ditinjau, bukan pasti lebih berbahaya.':''}</p></div><p>Semua angka dan lokasi fasilitas adalah data contoh. Status Normal pada DBSCAN berarti pola data mirip, bukan semua bayi sehat.</p><button class="primary-button" id="show-on-map">Lihat wilayah pada peta ↗</button>`);$('#show-on-map').onclick=()=>{$('#detail-dialog').close();$('#region').value=f.area;legendFilter=null;navigate('peta')}}
-const INTRO_KEY='sbbl-methodology-intro-v3';
+
 function methodology(){
   let dialog=$('#intro-dialog');
   if(!dialog){
@@ -107,19 +107,14 @@ function methodology(){
       <div class="intro-simulation">Prototipe ini memakai data simulasi dan belum menjalankan algoritma pada data penelitian nyata.</div>
       <div class="intro-actions"><button class="primary-button" id="intro-start">Mulai jelajahi dashboard <span>→</span></button><small>Bisa dibaca kembali melalui tombol ⓘ atau Pahami cara membaca peta.</small></div>`;
     document.body.appendChild(dialog);
-    const remember=()=>{try{localStorage.setItem(INTRO_KEY,'seen')}catch{}}; const close=()=>{remember();dialog.close()};
+    const close=()=>dialog.close();
     $('#intro-close').onclick=close;$('#intro-start').onclick=close;
-    dialog.addEventListener('close',()=>{remember();$('#info-button').focus({preventScroll:true})});
+    dialog.addEventListener('close',()=>{$('#info-button').focus({preventScroll:true})});
   }
   if(!dialog.open){dialog.showModal();dialog.scrollTop=0;$('#intro-title').focus({preventScroll:true})}
-}
-function showFirstVisitIntroduction(){
-  let seen=false;
-  try{seen=localStorage.getItem(INTRO_KEY)==='seen'}catch{}
-  if(!seen)methodology();
 }
 $$('[data-mode]').forEach(b=>b.onclick=()=>{mode=b.dataset.mode;legendFilter=null;$$('[data-mode]').forEach(x=>{x.classList.toggle('active',x===b);x.setAttribute('aria-pressed',x===b)});renderMap()});$$('[data-chart]').forEach(b=>b.onclick=()=>{chartType=b.dataset.chart;$$('[data-chart]').forEach(x=>{x.classList.toggle('active',x===b);x.setAttribute('aria-pressed',x===b)});renderChart()});$$('[data-risk]').forEach(b=>b.onclick=()=>{riskFilter=b.dataset.risk;renderTable()});$('#region').onchange=()=>{legendFilter=null;render()};$('#period').onchange=render;$('#search').oninput=renderTable;$('#all-facilities').onclick=()=>{riskFilter='Semua';navigate('data')};$('#map-table').onclick=()=>{riskFilter=mode==='dbscan'?'Outlier':'Semua';navigate('data')};$('#zoom-in').onclick=()=>{if(ensureMap())geoMap.zoomIn(1,{animate:false})};$('#zoom-out').onclick=()=>{if(ensureMap())geoMap.zoomOut(1,{animate:false})};$('#reset-map').onclick=()=>{legendFilter=null;renderMap();fitMapRegion()};$('.dialog-close').onclick=()=>$('#detail-dialog').close();$('#detail-dialog').onclick=e=>{if(e.target===$('#detail-dialog')){const r=e.target.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)e.target.close()}};$('#method').onclick=methodology;$('#info-button').onclick=methodology;
 $('#export').onclick=()=>{const q=$('#search').value.toLowerCase();const data=current().filter(f=>page!=='data'||((riskFilter==='Semua'||(riskFilter==='Outlier'?f.outlier:riskFilter==='Normal'?!f.outlier:f.risk===riskFilter))&&`${f.name} ${f.area}`.toLowerCase().includes(q)));const rows=[['Nama fasyankes','Wilayah','Sampel','TSH maksimum (uIU/mL)','Risiko','DBSCAN','Periode','Sumber'],...data.map(f=>[f.name,f.area,f.samples,f.tsh,f.risk,f.outlier?'Outlier':'Normal',$('#period').selectedOptions[0].text,'DATA SINTETIS'])];const blob=new Blob(['\uFEFF'+rows.map(r=>r.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(',')).join('\r\n')],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`SBBL-simulasi-2026-${$('#period').value}.csv`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);$('#toast').textContent=`${data.length} fasilitas diekspor sebagai CSV`;$('#toast').classList.add('show');setTimeout(()=>$('#toast').classList.remove('show'),3000)};
 page=navItems.some(n=>n[0]===location.hash.slice(1))?location.hash.slice(1):'beranda';renderPage();
 
-showFirstVisitIntroduction();
+
