@@ -12,7 +12,7 @@ Workspace `D:\PrototypeGIS` sudah disiapkan untuk remote `https://github.com/mif
 
 Menyimpan file tidak langsung mengirimnya. Commit mencatat versi yang siap dipublikasikan. Bila sinkronisasi gagal atau ada konflik, selesaikan masalah di Source Control, lalu pilih **Sync Changes**.
 
-Git Portable tersimpan di `.tools/git` dan konfigurasinya berada di `.vscode/settings.json`. Kedua folder tersebut diabaikan oleh Git. Jika folder proyek dipindah, sesuaikan `git.path` dan PATH terminal pada pengaturan workspace. Identitas commit lokal menggunakan username GitHub dan alamat noreply; pengaturan Git global komputer tidak diubah.
+Git Portable tersimpan di `.tools/git`. `git.path` diatur di User Settings VS Code karena pengaturan ini tidak didukung pada tingkat workspace. Pengaturan sinkronisasi dan PATH terminal berada di `.vscode/settings.json`. Kedua folder lokal tersebut diabaikan oleh Git. Jika folder proyek dipindah, sesuaikan `git.path` di User Settings serta PATH terminal di pengaturan workspace. Identitas commit lokal menggunakan username GitHub dan alamat noreply; pengaturan Git global komputer tidak diubah.
 
 Aplikasi ini adalah situs statis. Tidak memerlukan Node.js, backend, atau API key. Peta memerlukan koneksi internet.
 
@@ -23,7 +23,7 @@ Aplikasi ini adalah situs statis. Tidak memerlukan Node.js, backend, atau API ke
 3. Buka https://github.com/miftahillahx3/prototypegis/upload/main (atau pilih **uploading an existing file** pada halaman repositori kosong). Unggah **isi** hasil ekstraksi: `index.html`, `style.css`, `app.js`, `.nojekyll`, `README.md`, `PUBLISH.md`, serta folder `vendor`. Pastikan `index.html` langsung di root repositori dan struktur folder `vendor/leaflet` tetap sama.
 4. Pilih **Commit changes** ke branch `main`.
 5. Buka https://github.com/miftahillahx3/prototypegis/settings/pages (**Settings → Pages → Build and deployment**). Pilih **Deploy from a branch**, branch **main**, folder **/(root)**, kemudian **Save**.
-6. Tunggu deployment selesai. Buka URL yang ditampilkan pada halaman Settings → Pages. URL proyek ini setelah deployment berhasil: https://miftahillahx3.github.io/prototypegis/. URL tersebut belum aktif sebelum file diunggah dan Pages diaktifkan.
+6. Tunggu deployment selesai. Buka URL yang ditampilkan pada halaman Settings → Pages. URL proyek ini setelah deployment berhasil: https://miftahillahx3.github.io/prototypegis/. GitHub Pages telah dikonfigurasi untuk branch main dan folder root. Setelah push, tunggu deployment selesai sebelum memeriksa versi terbaru.
 7. Salin URL tersebut ke bagian **About → Website** repositori atau ke README portofolio Anda. Coba juga URL dari HP.
 
 Jika repository bernama `USERNAME.github.io`, URL situs adalah `https://USERNAME.github.io/`. Jangan menimpa situs portofolio yang sudah ada tanpa menyesuaikan strukturnya.

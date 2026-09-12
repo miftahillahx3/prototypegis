@@ -10,6 +10,6 @@ Semua 812 fasilitas, nilai, dan koordinat adalah data sintetis. Peta dasar menam
 
 ## Demo publik dan portofolio
 
-Siap dihosting sebagai situs statis melalui GitHub Pages. Ikuti [panduan publikasi](PUBLISH.md) untuk mengunggah aplikasi dan mengaktifkan URL publik. Repositori: [miftahillahx3/prototypegis](https://github.com/miftahillahx3/prototypegis). Alamat demo setelah deployment berhasil: https://miftahillahx3.github.io/prototypegis/ (belum aktif sebelum GitHub Pages diaktifkan).
+Siap dihosting sebagai situs statis melalui GitHub Pages. Ikuti [panduan publikasi](PUBLISH.md) untuk mengunggah aplikasi dan mengaktifkan URL publik. Repositori: [miftahillahx3/prototypegis](https://github.com/miftahillahx3/prototypegis). Demo publik: [SBBL Jawa Barat](https://miftahillahx3.github.io/prototypegis/). GitHub Pages memperbarui situs setelah perubahan dikirim ke branch `main`.
 
 Teknologi: HTML, CSS responsif, JavaScript, Leaflet 1.9.4, dan OpenStreetMap. Data simulasi diproses di browser. Ringkasan K-Means/DBSCAN mengikuti kategori, wilayah, serta periode yang dipilih.
