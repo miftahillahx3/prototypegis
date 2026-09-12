@@ -1,0 +1,40 @@
+<!doctype html><meta charset="utf-8"><title>Zoom regression check</title>
+<pre id="results">RUNNING</pre><iframe id="app"  style="width:1100px;height:1000px;border:0"></iframe>
+<script>
+const results=document.querySelector('#results'),frame=document.querySelector('#app');
+const wait=()=>new Promise(resolve=>setTimeout(resolve,450));
+frame.onload=async()=>{
+  const checks=[];
+  function check(name,condition){if(!condition)throw new Error(name);checks.push('PASS: '+name)}
+  try{
+    const win=frame.contentWindow,doc=win.document;
+    await wait();
+    const map=win.eval('geoMap');
+    check('Leaflet initialized',!!map);
+    map.options.zoomAnimation=false;
+    const initial=map.getZoom();
+    doc.querySelector('#zoom-in').click();await wait();
+    check('Plus increases zoom by one ('+initial+' -> '+map.getZoom()+')',map.getZoom()===initial+1);
+    doc.querySelector('#zoom-out').click();await wait();
+    check('Minus restores previous zoom',map.getZoom()===initial);
+    doc.querySelector('#zoom-out').click();await wait();
+    check('Minus zooms out from province view',map.getZoom()===initial-1);
+    doc.querySelector('#reset-map').click();await wait();
+    check('Reset restores province extent',map.getZoom()===initial);
+    check('Mouse wheel zoom enabled',map.scrollWheelZoom.enabled());
+    check('Touch pinch zoom enabled',map.touchZoom.enabled());
+    doc.querySelector('#region').value='Bandung Raya';doc.querySelector('#region').dispatchEvent(new Event('change'));await wait();
+    const cityZoom=map.getZoom();check('Region filter zooms to city',cityZoom>initial);
+    doc.querySelector('#zoom-in').click();await wait();check('Zoom works after region filter',map.getZoom()===cityZoom+1);
+    doc.querySelector('[data-mode="dbscan"]').click();await wait();check('Mode change preserves zoom',map.getZoom()===cityZoom+1);
+    frame.style.width='390px';await wait();
+    doc.querySelector('#zoom-out').click();await wait();check('Zoom works at mobile width',map.getZoom()===cityZoom);
+    const button=doc.querySelector('#zoom-in');button.scrollIntoView({block:'center'});await wait();
+    const rect=button.getBoundingClientRect();check('Mobile zoom button is not covered',doc.elementFromPoint(rect.x+rect.width/2,rect.y+rect.height/2)===button);
+    results.textContent=checks.join('\n')+'\nALL PASSED';
+  }catch(error){results.textContent=checks.join('\n')+'\nFAIL: '+error.message}
+};
+fetch('../index.html').then(r=>r.text()).then(html=>{
+  frame.srcdoc=html.replace('<head>','<head><base href="http://localhost:8080/">').replace('<script src="app.js">','<script>L.tileLayer=()=>L.layerGroup();<\/script><script src="app.js">');
+});
+</script>

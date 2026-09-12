@@ -1,0 +1,21 @@
+# Local browser profiles and verification artifacts
+.browser-*/
+browser-*.html
+*.log
+map-*-check.png
+tests/*result.html
+
+# Generated publication package
+publish/
+sbbl-jawa-barat-github.zip
+
+# Local credentials and editor files
+.env
+.env.*
+!.env.example
+.vscode/
+.DS_Store
+Thumbs.db
+
+repository-info.json
+.tools/

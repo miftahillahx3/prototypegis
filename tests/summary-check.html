@@ -1,0 +1,28 @@
+<!doctype html><meta charset="utf-8"><title>Summary regression</title>
+<pre id="results">RUNNING</pre><iframe id="app" style="width:1100px;height:1000px"></iframe>
+<script>
+const frame=document.querySelector('#app');
+frame.onload=()=>{
+ const win=frame.contentWindow,doc=win.document,checks=[];
+ if(!doc.querySelector('#zones'))return;
+ const check=(name,ok)=>{if(!ok)throw Error(name);checks.push('PASS: '+name)};
+ const counts=()=>[...doc.querySelectorAll('#zones b')].map(e=>Number(e.textContent.replaceAll('.','')));
+ try{
+  check('Initial K-Means counts',counts().join(',')==='526,246,40');
+  doc.querySelector('[data-mode="dbscan"]').click();
+  check('DBSCAN heading and categories',doc.querySelector('.zone-card h2').textContent==='Ringkasan anomali'&&!!doc.querySelector('[data-zone="Normal"]'));
+  check('DBSCAN counts',counts().join(',')==='791,21');
+  check('Two distribution segments',doc.querySelectorAll('.zone-card .distribution-bar i').length===2);
+  doc.querySelector('#period').value='6';doc.querySelector('#period').dispatchEvent(new Event('change'));
+  check('Period changes DBSCAN summary',counts().join(',')==='633,17');
+  doc.querySelector('#region').value='Cirebon';doc.querySelector('#region').dispatchEvent(new Event('change'));
+  check('Region total matches map',counts().reduce((a,b)=>a+b,0)===win.eval('current().length'));
+  doc.querySelector('[data-zone="Normal"]').click();
+  check('Normal row opens filtered data',doc.querySelector('[data-risk="Normal"]').classList.contains('active')&&[...doc.querySelectorAll('#facility-table tr')].every(row=>row.cells[4]?.textContent==='Normal'));
+  win.navigate('peta');doc.querySelector('[data-mode="kmeans"]').click();
+  check('Switch back restores three risk groups',counts().length===3&&!!doc.querySelector('[data-zone="Tinggi"]')&&doc.querySelector('.zone-card h2').textContent==='Ringkasan zonasi');
+  document.querySelector('#results').textContent=checks.join('\n')+'\nALL PASSED';
+ }catch(error){document.querySelector('#results').textContent=checks.join('\n')+'\nFAIL: '+error.message}
+};
+fetch('../index.html').then(r=>r.text()).then(html=>{frame.srcdoc=html.replace('<head>','<head><base href="http://localhost:8080/">').replace('<script src="app.js">','<script>L.tileLayer=()=>L.layerGroup();<\/script><script src="app.js">')});
+</script>
