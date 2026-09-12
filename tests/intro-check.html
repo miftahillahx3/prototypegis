@@ -3,7 +3,7 @@
 const frame=document.querySelector('#app'),result=document.querySelector('#results'),checks=[];
 const check=(name,ok)=>{if(!ok)throw Error(name);checks.push('PASS: '+name)};
 let phase=0,source='';
-localStorage.removeItem('sbbl-methodology-intro-v1');
+localStorage.removeItem('sbbl-methodology-intro-v2');
 frame.onload=async()=>{
  const doc=frame.contentDocument;if(!doc.querySelector('#stats'))return;
  try{
@@ -15,7 +15,7 @@ frame.onload=async()=>{
    check('Accessible title receives focus',doc.activeElement.id==='intro-title');
    check('Mobile dialog fits viewport',intro.getBoundingClientRect().width<=390&&intro.scrollWidth<=intro.clientWidth);
    doc.querySelector('#intro-start').click();await new Promise(r=>setTimeout(r,50));
-   check('Start closes and remembers visit',!intro.open&&localStorage.getItem('sbbl-methodology-intro-v1')==='seen');
+   check('Start closes and remembers visit',!intro.open&&localStorage.getItem('sbbl-methodology-intro-v2')==='seen');
    phase=1;frame.srcdoc=source;
   }else{
    check('Returning visit does not open dialog',!intro?.open);
