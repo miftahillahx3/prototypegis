@@ -164,8 +164,22 @@ function renderMap() {
   for (const group of groups.values()) {
     const f = group.reduce((a, b) => Object.keys(colors).indexOf(a.risk) > Object.keys(colors).indexOf(b.risk) ? a : b);
     const color = mode === 'kmeans' ? colors[f.risk] : group.some(x => x.outlier) ? '#ed666a' : '#188ef1';
-    const marker = L.circleMarker([f.lat, f.lng], { radius: 6 + Math.sqrt(Math.max(...group.map(x => x.samples))), color: '#fff', weight: 1.3, fillColor: color, fillOpacity: .85 }).addTo(markerLayer);
-    marker.bindTooltip(`${escapeHTML(f.matchedName || f.name)}<br>${group.length} nama dalam Excel<br><small>Klik untuk detail dan sumber lokasi</small>`, { direction: 'top' });
+    const marker = L.circleMarker([f.lat, f.lng], {
+      radius: 6 + Math.sqrt(Math.max(...group.map(x => x.samples))),
+      color: '#ffffff',
+      weight: 1.6,
+      opacity: 1,
+      fillColor: color,
+      fillOpacity: .9,
+      className: 'map-point'
+    }).addTo(markerLayer);
+    const el = marker.getElement();
+    if (el) {
+      el.style.setProperty('--map-color', color);
+      el.style.animation = 'map-point-pulse 1.8s ease-in-out infinite';
+      el.style.filter = 'drop-shadow(0 3px 7px rgba(15, 71, 120, 0.28))';
+    }
+    marker.bindTooltip(`${escapeHTML(f.matchedName || f.name)}<br><small>Klik untuk detail dan sumber lokasi</small>`, { direction: 'top' });
     const open = () => {
       if (group.length === 1) { showDetail(f.id); return; }
       showDialog(`<h2>Beberapa nama pada lokasi yang sama</h2><p>Nama asli tetap dianalisis terpisah. Warna titik mengikuti klaster tertinggi atau adanya outlier di lokasi ini.</p>${group.map(x => `<button class="facility-row" data-id="${x.id}">${escapeHTML(x.name)} · ${x.samples} sampel · ${x.risk} · ${x.outlier ? 'Outlier' : 'Bukan outlier'}</button>`).join('')}`); bindDetails();
