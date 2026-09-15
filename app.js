@@ -39,12 +39,12 @@ function animateCounts(root=document){
   });
 }
 function customSelect(select){
-  if(select.dataset.customized)return select.parentElement.querySelector('.custom-select');
+  if(select.dataset.customized)return select.parentElement;
   select.dataset.customized='true';
   const wrapper=document.createElement('div');wrapper.className='custom-select';
   const trigger=document.createElement('button');trigger.type='button';trigger.className='custom-select-trigger';trigger.setAttribute('aria-haspopup','listbox');trigger.setAttribute('aria-expanded','false');
   const menu=document.createElement('div');menu.className='custom-select-menu';menu.setAttribute('role','listbox');
-  select.parentElement.insertBefore(wrapper,select);wrapper.append(trigger,menu);
+  select.parentElement.insertBefore(wrapper,select);wrapper.append(trigger,menu,select);
   const close=()=>{wrapper.classList.remove('open');trigger.setAttribute('aria-expanded','false')};
   trigger.onclick=()=>{const open=wrapper.classList.toggle('open');trigger.setAttribute('aria-expanded',open);};
   select.customRefresh=()=>{
