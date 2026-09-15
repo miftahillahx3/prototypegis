@@ -173,11 +173,11 @@ function renderMap() {
       fillOpacity: .9,
       className: 'map-point'
     }).addTo(markerLayer);
-    const el = marker.getElement();
-    if (el) {
-      el.style.setProperty('--map-color', color);
-      el.style.animation = 'map-point-pulse 1.8s ease-in-out infinite';
-      el.style.filter = 'drop-shadow(0 3px 7px rgba(15, 71, 120, 0.28))';
+    const markerElement = marker.getElement();
+    if (markerElement) {
+      markerElement.style.setProperty('--map-color', color);
+      markerElement.style.animation = 'map-point-pulse 1.8s ease-in-out infinite';
+      markerElement.style.filter = 'drop-shadow(0 3px 7px rgba(15, 71, 120, 0.28))';
     }
     marker.bindTooltip(`${escapeHTML(f.matchedName || f.name)}<br><small>Klik untuk detail dan sumber lokasi</small>`, { direction: 'top' });
     const open = () => {
@@ -185,7 +185,12 @@ function renderMap() {
       showDialog(`<h2>Beberapa nama pada lokasi yang sama</h2><p>Nama asli tetap dianalisis terpisah. Warna titik mengikuti klaster tertinggi atau adanya outlier di lokasi ini.</p>${group.map(x => `<button class="facility-row" data-id="${x.id}">${escapeHTML(x.name)} · ${x.samples} sampel · ${x.risk} · ${x.outlier ? 'Outlier' : 'Bukan outlier'}</button>`).join('')}`); bindDetails();
     };
     marker.on('click', open);
-    const el = marker.getElement(); if (el) { el.setAttribute('tabindex', '0'); el.setAttribute('role', 'button'); el.setAttribute('aria-label', `${f.matchedName || f.name}, ${group.length} nama, lihat detail`); el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } }); }
+    if (markerElement) {
+      markerElement.setAttribute('tabindex', '0');
+      markerElement.setAttribute('role', 'button');
+      markerElement.setAttribute('aria-label', `${f.matchedName || f.name}, ${group.length} nama, lihat detail`);
+      markerElement.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
+    }
   }
   requestAnimationFrame(() => { geoMap.invalidateSize(); if (lastMapRegion !== $('#region').value) fitMapRegion() });
 }
