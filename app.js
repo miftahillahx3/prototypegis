@@ -144,16 +144,35 @@ function ensureMap(){
 function renderMap(){
   renderZoneSummary();
   const list=current(),normal=list.filter(f=>!f.outlier).length,out=list.length-normal;
-  $('#legend').innerHTML=(mode==='kmeans'?Object.keys(colors).map(r=>[r,colors[r],list.filter(f=>f.risk===r).length]):[['Normal','#188ef1',normal],['Outlier','#ed666a',out]]).map(([r,c,n])=>`<button data-legend="${r}" class="${legendFilter&&legendFilter!==r?'dim':''}" aria-pressed="${legendFilter===r}"><i style="--c:${c}"></i>${r} <span>(${n})</span></button>`).join('');
+  const legendEntries=(mode==='kmeans'?Object.keys(colors).map(r=>[r,colors[r],list.filter(f=>f.risk===r).length]):[['Normal','#188ef1',normal],['Outlier','#ed666a',out]]);
+  const mappedLegendEntries=legendEntries.map(([r,c,total])=>{
+    const mapped=list.filter(f=>Number.isFinite(f.lat)&&Number.isFinite(f.lng)&&(!legendFilter||(mode==='kmeans'?f.risk===legendFilter:(f.outlier?'Outlier':'Normal')===legendFilter))&&(mode==='kmeans'?f.risk===r:(f.outlier?'Outlier':'Normal')===r)).length;
+    return {r,c,total,mapped};
+  });
+  $('#legend').innerHTML=mappedLegendEntries.map(({r,c,total,mapped})=>`<button data-legend="${r}" class="${legendFilter&&legendFilter!==r?'dim':''}" aria-pressed="${legendFilter===r}"><i style="--c:${c}"></i>${r} <span>(${mapped}/${total})</span></button>`).join('');
   $$('[data-legend]').forEach(b=>b.onclick=()=>{legendFilter=legendFilter===b.dataset.legend?null:b.dataset.legend;renderMap()});
-  $('#map-footnote').textContent=mode==='kmeans'?`${activeAnalysis.centers.length} klaster K-Means · data penelitian`:`${out} outlier DBSCAN · data penelitian`;
   if(!ensureMap())return;
   markerLayer.clearLayers();
   const points=list.filter(f=>Number.isFinite(f.lat)&&Number.isFinite(f.lng)&&(!legendFilter||(mode==='kmeans'?f.risk===legendFilter:(f.outlier?'Outlier':'Normal')===legendFilter)));
-  $('#map-footnote').textContent+=` · ${points.length} titik ditampilkan`;
+  const mappedTotal=points.length;
   const groups=new Map();
   for(const f of points){const key=`${f.lat},${f.lng}`;if(!groups.has(key))groups.set(key,[]);groups.get(key).push(f);}
-  $('#map-footnote').textContent=`${points.length} nama pada ${groups.size} lokasi · legenda mencakup seluruh data, termasuk yang belum terpetakan`;
+  const totalMappedByCategory = mode==='kmeans'
+    ? Object.keys(colors).map(r=>({r, count:list.filter(f=>Number.isFinite(f.lat)&&Number.isFinite(f.lng)&&f.risk===r).length}))
+    : [{r:'Normal', count:list.filter(f=>Number.isFinite(f.lat)&&Number.isFinite(f.lng)&&!f.outlier).length},{r:'Outlier', count:list.filter(f=>Number.isFinite(f.lat)&&Number.isFinite(f.lng)&&f.outlier).length}];
+  const summaryText = mode==='kmeans'
+    ? `${mappedTotal} titik tampil di peta dari ${activeAnalysis.centers.length} klaster K-Means · ${totalMappedByCategory.map(({r,count})=>`${r}: ${count}`).join(' · ')}`
+    : `${mappedTotal} titik tampil di peta dari ${out} outlier DBSCAN · ${totalMappedByCategory.map(({r,count})=>`${r}: ${count}`).join(' · ')}`;
+  $('#map-footnote').textContent = summaryText;
+  if (legendFilter) {
+    $('#map-footnote').textContent += ` · filter aktif: ${legendFilter}`;
+  }
+  if (mappedTotal < list.length) {
+    $('#map-status').hidden = false;
+    $('#map-status').textContent = `Ada ${list.length - mappedTotal} fasilitas dalam kategori aktif yang belum punya koordinat valid, jadi peta hanya menampilkan ${mappedTotal} titik.`;
+  } else {
+    $('#map-status').hidden = true;
+  }
   for(const group of groups.values()){
     const f=group.reduce((a,b)=>Object.keys(colors).indexOf(a.risk)>Object.keys(colors).indexOf(b.risk)?a:b);
     const color=mode==='kmeans'?colors[f.risk]:group.some(x=>x.outlier)?'#ed666a':'#188ef1';
