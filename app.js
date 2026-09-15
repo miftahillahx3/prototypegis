@@ -38,14 +38,37 @@ function animateCounts(root=document){
     requestAnimationFrame(tick);
   });
 }
-function current(){const region=$('#region').value;return facilities.filter(f=>region==='all'||f.area===region);}
+function customSelect(select){
+  if(select.dataset.customized)return select.parentElement.querySelector('.custom-select');
+  select.dataset.customized='true';
+  const wrapper=document.createElement('div');wrapper.className='custom-select';
+  const trigger=document.createElement('button');trigger.type='button';trigger.className='custom-select-trigger';trigger.setAttribute('aria-haspopup','listbox');trigger.setAttribute('aria-expanded','false');
+  const menu=document.createElement('div');menu.className='custom-select-menu';menu.setAttribute('role','listbox');
+  select.parentElement.insertBefore(wrapper,select);wrapper.append(trigger,menu);
+  const close=()=>{wrapper.classList.remove('open');trigger.setAttribute('aria-expanded','false')};
+  trigger.onclick=()=>{const open=wrapper.classList.toggle('open');trigger.setAttribute('aria-expanded',open);};
+  select.customRefresh=()=>{
+    const selected=select.selectedOptions[0];trigger.innerHTML=`<span>${escapeHTML(selected?.textContent||'Pilih')}</span><b>⌄</b>`;
+    menu.innerHTML=[...select.options].map(option=>`<button type="button" role="option" data-value="${escapeHTML(option.value)}" aria-selected="${option.selected}">${escapeHTML(option.textContent)}</button>`).join('');
+    menu.querySelectorAll('[data-value]').forEach(option=>option.onclick=()=>{select.value=option.dataset.value;select.dispatchEvent(new Event('change'));close()});
+  };
+  document.addEventListener('click',event=>{if(!wrapper.contains(event.target))close()});
+  select.customRefresh();return wrapper;
+}
+function refreshRegionOptions(){
+  const select=$('#region'),previous=select.value;
+  select.innerHTML='<option value="all">Seluruh fasyankes</option>'+facilities.map(f=>`<option value="facility:${f.id}">${escapeHTML(f.name)}</option>`).join('');
+  select.value=[...select.options].some(option=>option.value===previous)?previous:'all';
+  select.customRefresh?.();
+}
+function current(){const region=$('#region').value;return facilities.filter(f=>region==='all'||region===f.area||(region===`facility:${f.id}`));}
 function badge(r){return `<span class="badge" style="--c:${colors[r]};--bg:${backgrounds[r]}">${r}</span>`}
 const navItems=[['beranda','home','Beranda'],['peta','map','Peta'],['data','table','Data'],['laporan','chart','Analisis']];
 function navigate(next){page=next;location.hash=next;renderPage();window.scrollTo({top:0,behavior:'smooth'})}
 function renderPage(){const info={beranda:['Setiap awal kehidupan,<br><span>layak mendapat perhatian.</span>','Lihat kelompok dan perbedaan data pemeriksaan bayi baru lahir di Kabupaten Cianjur.','Ringkasan wilayah'],peta:['Analisis profil fasyankes<br><span>dalam satu pandangan.</span>','Lihat fasilitas kesehatan yang datanya mirip dan yang polanya berbeda.','Eksplorasi peta'],data:['Data yang terhubung.<br><span>Wawasan yang bermakna.</span>','Telusuri hasil skrining dan profil fasilitas kesehatan di wilayah pengamatan.','Direktori fasyankes'],laporan:['Dari data,<br><span>menjadi pemahaman.</span>','Pelajari distribusi TSH dan volume pemeriksaan dari data penelitian.','Statistik & analisis']}[page];$('#page-title').innerHTML=info[0];$('#page-desc').textContent=info[1];$('#crumb').textContent=info[2];for(const target of ['#side-nav','#mobile-nav']){$(target).innerHTML=navItems.map(([id,icon,label])=>`<a href="#${id}" class="nav-link ${page===id?'active':''}" ${page===id?'aria-current="page"':''}><span class="nav-icon" data-icon="${icon}">${icon}</span><span class="nav-label">${label}</span></a>`).join('');}$('#dashboard').hidden=page==='data';$('#data-page').hidden=page!=='data';$('.content-grid').hidden=page==='laporan';$('.bottom-grid').hidden=page==='peta';render()}
 window.addEventListener('hashchange',()=>{const next=location.hash.slice(1);if(navItems.some(n=>n[0]===next)&&page!==next){page=next;renderPage()}});
 function render(){
- const analysis=runAnalysis(),list=current(),count=list.reduce((n,f)=>n+f.samples,0);
+ const analysis=runAnalysis();refreshRegionOptions();const list=current(),count=list.reduce((n,f)=>n+f.samples,0);
  const validated=list.reduce((n,f)=>n+(f.statuses.Validated||0),0);
  $('#stats').innerHTML=[['samples','∑',count,'Total sampel'],['facilities','⌂',list.length,'Nama fasyankes di Excel'],['validated','✓',validated,'Status Validated'],['verified','↗',count-validated,'Verified / Finished']].map(([icon,glyph,value,label])=>`<article class="stat stat-${icon}"><span class="stat-icon">${glyph}</span><div><strong class="count-up" data-count="${value}">${format(value)}</strong><p>${label}</p></div></article>`).join('');
  $('#priority-list').innerHTML=list.filter(f=>f.risk==='Tinggi').slice(0,4).map(f=>`<button class="facility-row" data-id="${f.id}"><span class="facility-symbol">⌖</span><span><strong>${escapeHTML(f.name)}</strong><small>${f.samples} sampel · rerata TSH ${f.mean.toFixed(2).replace('.',',')}</small></span>${badge(f.risk)}<span class="chevron">›</span></button>`).join('')||'<p class="section-description">Tidak ada fasilitas dalam klaster tinggi pada periode ini.</p>';
@@ -181,7 +204,8 @@ function methodology(){
 $$('[data-mode]').forEach(b=>b.onclick=()=>{mode=b.dataset.mode;legendFilter=null;$$('[data-mode]').forEach(x=>{x.classList.toggle('active',x===b);x.setAttribute('aria-pressed',x===b)});renderMap()});$$('[data-chart]').forEach(b=>b.onclick=()=>{chartType=b.dataset.chart;$$('[data-chart]').forEach(x=>{x.classList.toggle('active',x===b);x.setAttribute('aria-pressed',x===b)});renderChart()});$$('[data-risk]').forEach(b=>b.onclick=()=>{riskFilter=b.dataset.risk;renderTable()});$('#region').onchange=()=>{legendFilter=null;render()};$('#period').onchange=()=>{legendFilter=null;render()};$('#search').oninput=renderTable;$('#all-facilities').onclick=()=>{riskFilter='Semua';navigate('data')};$('#map-table').onclick=()=>{riskFilter=mode==='dbscan'?'Outlier':'Semua';navigate('data')};$('#zoom-in').onclick=()=>{if(ensureMap())geoMap.zoomIn(1,{animate:false})};$('#zoom-out').onclick=()=>{if(ensureMap())geoMap.zoomOut(1,{animate:false})};$('#reset-map').onclick=()=>{legendFilter=null;renderMap();fitMapRegion()};$('.dialog-close').onclick=()=>$('#detail-dialog').close();$('#detail-dialog').onclick=e=>{if(e.target===$('#detail-dialog')){const r=e.target.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)e.target.close()}};$('#method').onclick=methodology;$('#info-button').onclick=methodology;
 $('#export').onclick=()=>{const q=$('#search').value.toLowerCase();const data=current().filter(f=>page!=='data'||((riskFilter==='Semua'||(riskFilter==='Outlier'?f.outlier:riskFilter==='Normal'?!f.outlier:f.risk===riskFilter))&&`${f.name} ${escapeHTML(f.area)}`.toLowerCase().includes(q)));const rows=[['Nama fasyankes','Wilayah','Sampel','TSH rata-rata (uU/mL)','TSH maksimum (uU/mL)','Klaster profil','DBSCAN','Periode','Sumber'],...data.map(f=>[f.name,f.area,f.samples,f.mean,f.tsh,f.risk,f.outlier?'Outlier':'Normal',$('#period').selectedOptions[0].text,ResearchData.metadata.source])];const blob=new Blob(['\uFEFF'+rows.map(r=>r.map(v=>'"'+String(/^[=+@-]/.test(String(v)) ? "'"+v : v).replaceAll('"','""')+'"').join(',')).join('\r\n')],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`SBBL-penelitian-${$('#period').value}.csv`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);$('#toast').textContent=`${data.length} fasilitas diekspor sebagai CSV`;$('#toast').classList.add('show');setTimeout(()=>$('#toast').classList.remove('show'),3000)};
 $('#period').innerHTML='<option value="all">Seluruh data (Jun–Agu 2026)</option>'+[...new Set(ResearchData.aggregates.map(f=>f.month))].sort().map(m=>`<option value="${m}">${m}</option>`).join('');
-$('#region').innerHTML='<option value="all">Seluruh fasyankes</option><option>Kabupaten Cianjur</option>';$('#region').disabled=false;
+$('#region').innerHTML='<option value="all">Seluruh fasyankes</option>';$('#region').disabled=false;
+customSelect($('#period'));customSelect($('#region'));
 page=navItems.some(n=>n[0]===location.hash.slice(1))?location.hash.slice(1):'beranda';renderPage();
 
 
