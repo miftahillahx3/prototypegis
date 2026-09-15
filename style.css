@@ -40,8 +40,8 @@
 .leaflet-control-scale-line{font-size:9px!important}
 #map-status{position:absolute;top:55px;left:12px;right:12px;z-index:3;background:#fff8e9;color:#826126;border:1px solid #efd79e;padding:10px 12px;border-radius:7px;font-size:11px;line-height:1.6}
 #map-status a{color:#087af5}
-.map-point{transform-box:fill-box;transform-origin:center;filter:drop-shadow(0 3px 7px rgba(15,71,120,.25));stroke:#fff;stroke-width:1.6;transition:transform .2s ease,opacity .2s ease,filter .2s ease}
-.map-point:hover{transform:scale(1.12)}
+.leaflet-container .leaflet-interactive.map-point{transform-box:fill-box;transform-origin:center;stroke:rgba(255,255,255,.95);stroke-width:2;vector-effect:non-scaling-stroke;filter:drop-shadow(0 4px 10px rgba(13,55,92,.22));transition:transform .2s ease,opacity .2s ease,filter .2s ease,stroke-width .2s ease}
+.leaflet-container .leaflet-interactive.map-point:hover{transform:scale(1.15);filter:drop-shadow(0 6px 12px rgba(13,55,92,.28));stroke-width:2.2}
 @keyframes map-point-pulse{0%{transform:scale(1);opacity:1}35%{transform:scale(1.12);opacity:1}100%{transform:scale(1);opacity:.9}}
 @media(max-width:600px){#map{width:100%;margin:0}.map-caption{font-size:6px;max-width:calc(100% - 65px)}.leaflet-control-attribution{font-size:8px!important}}
 

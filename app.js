@@ -220,6 +220,29 @@ function showDetail(id) {
 
 }
 
+function showDetail(id) {
+  const f = facilities.find(f => f.id === id); if (!f) return;
+  const locationText = Number.isFinite(f.lat)
+    ? (f.sourceTitle ? escapeHTML(f.sourceTitle) : 'Koordinat fasilitas tersedia untuk dipetakan.')
+    : 'Lokasi fasilitas belum tersedia untuk ditampilkan di peta.';
+
+  showDialog(`<span class="eyebrow">INFORMASI FASILITAS KESEHATAN</span>
+    <h2>${escapeHTML(f.name)}</h2>
+    <p>Periode pemeriksaan: ${escapeHTML($('#period').selectedOptions[0].text)}</p>
+    ${badge(f.risk)}
+    <div class="detail-box">
+      <strong>Ringkasan</strong>
+      <div class="detail-line"><span>Jumlah sampel</span><strong>${f.samples}</strong></div>
+      <div class="detail-line"><span>TSH rata-rata</span><strong>${f.mean.toFixed(2).replace('.', ',')} µU/mL</strong></div>
+      <div class="detail-line"><span>TSH tertinggi</span><strong>${f.tsh.toFixed(2).replace('.', ',')} µU/mL</strong></div>
+      <div class="detail-line"><span>Status data</span><strong>${f.outlier ? 'Outlier' : 'Normal'}</strong></div>
+    </div>
+    <div class="detail-box">
+      <strong>Sumber lokasi</strong>
+      <p>${locationText}</p>
+    </div>`);
+}
+
 function methodology() {
   let dialog = $('#intro-dialog');
   if (!dialog) {
