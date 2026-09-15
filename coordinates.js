@@ -26,11 +26,13 @@ function parseCoordinateCSV(text) {
   if(!result.size)throw Error('Belum ada koordinat yang diisi.');
   return result;
 }
-$('#coordinate-template').onclick=()=>{
+const coordinateTemplate=$('#coordinate-template');
+if(coordinateTemplate)coordinateTemplate.onclick=()=>{
   const csv='\uFEFFnama_fasyankes,wilayah,latitude,longitude\r\n'+sourceNames.map(n=>'"'+n.replaceAll('"','""')+'",,,').join('\r\n');
   const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download='template-koordinat-fasyankes.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 };
-$('#coordinate-file').onchange=async event=>{
+const coordinateFile=$('#coordinate-file');
+if(coordinateFile)coordinateFile.onchange=async event=>{
   try{
     const file=event.target.files[0];if(!file)return;
     const imported=parseCoordinateCSV(await file.text());
@@ -39,10 +41,9 @@ $('#coordinate-file').onchange=async event=>{
     $('#region').innerHTML='<option value="all">Seluruh fasyankes</option>'+regions.map(r=>`<option>${escapeHTML(r)}</option>`).join('');$('#region').disabled=false;
     $('#map-status').hidden=true;lastMapRegion=null;legendFilter=null;render();
     $('.map-caption').textContent='KOORDINAT FASYANKES DARI CSV';
-    $('#coordinate-note').textContent=`${facilityCoordinates.size}/${sourceNames.length} nama memiliki koordinat; ${imported.size} diperbarui dari CSV untuk sesi ini.`;
-  }catch(error){$('#coordinate-note').textContent=error.message;}
+    if($('#coordinate-note'))$('#coordinate-note').textContent=`${facilityCoordinates.size}/${sourceNames.length} nama memiliki koordinat; ${imported.size} diperbarui dari CSV untuk sesi ini.`;
+  }catch(error){if($('#coordinate-note'))$('#coordinate-note').textContent=error.message;}
   event.target.value='';
 };
 
-$('#coordinate-note').textContent=`${FacilityLocations.metadata.mapped}/${sourceNames.length} nama memiliki koordinat referensi di Kabupaten Cianjur (${new Set([...facilityCoordinates.values()].map(f=>`${f.lat},${f.lng}`)).size} lokasi). Sisanya belum dapat dipastikan. Sumber dan tahun tersedia pada detail; referensi belum diperiksa di lapangan.`;
-const audit=document.createElement('a');audit.href='facility-location-audit.csv';audit.download='facility-location-audit.csv';audit.textContent='Unduh daftar lokasi dan status pencocokan';audit.className='text-button';$('#coordinate-note').after(audit);
+if($('#coordinate-note'))$('#coordinate-note').textContent=`${FacilityLocations.metadata.mapped}/${sourceNames.length} nama memiliki koordinat referensi di Kabupaten Cianjur (${new Set([...facilityCoordinates.values()].map(f=>`${f.lat},${f.lng}`)).size} lokasi). Sisanya belum dapat dipastikan.`;

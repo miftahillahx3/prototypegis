@@ -22,6 +22,22 @@ function runAnalysis(){
 }
 let page='beranda',mode='kmeans',riskFilter='Semua',chartType='distribution',legendFilter=null;
 const format=n=>new Intl.NumberFormat('id-ID').format(n);
+const coordinateTools=$('.coordinate-tools');
+if(coordinateTools)coordinateTools.remove();
+const dataUsed=document.createElement('section');
+dataUsed.className='data-used';
+dataUsed.innerHTML='<div><span class="eyebrow">DATA YANG DIGUNAKAN</span><h2>Ringkasan dataset penelitian</h2><p>Angka berikut menjadi dasar penerapan metode clustering dan profil fasyankes pada peta.</p></div><span class="data-used-mark">01 / 04</span>';
+$('#stats').before(dataUsed);
+const formatAnimated=(value,decimals=0)=>decimals?Number(value).toFixed(decimals).replace('.',','):format(Math.round(value));
+function animateCounts(root=document){
+  root.querySelectorAll('[data-count]').forEach(el=>{
+    const target=Number(el.dataset.count),decimals=Number(el.dataset.decimals||0);
+    if(!Number.isFinite(target))return;
+    const started=performance.now(),duration=850;
+    const tick=now=>{const progress=Math.min(1,(now-started)/duration),eased=1-Math.pow(1-progress,3);el.textContent=formatAnimated(target*eased,decimals);if(progress<1)requestAnimationFrame(tick)};
+    requestAnimationFrame(tick);
+  });
+}
 function current(){const region=$('#region').value;return facilities.filter(f=>region==='all'||f.area===region);}
 function badge(r){return `<span class="badge" style="--c:${colors[r]};--bg:${backgrounds[r]}">${r}</span>`}
 const navItems=[['beranda','⌂','Beranda'],['peta','◫','Peta'],['data','▤','Data'],['laporan','▥','Analisis']];
@@ -31,12 +47,13 @@ window.addEventListener('hashchange',()=>{const next=location.hash.slice(1);if(n
 function render(){
  const analysis=runAnalysis(),list=current(),count=list.reduce((n,f)=>n+f.samples,0);
  const validated=list.reduce((n,f)=>n+(f.statuses.Validated||0),0);
- $('#stats').innerHTML=[['▤',count,'Total sampel'],['♙',list.length,'Nama fasyankes di Excel'],['▦',validated,'Status Validated'],['✓',count-validated,'Verified / Finished']].map(([icon,value,label])=>`<article class="stat"><span class="stat-icon">${icon}</span><div><strong>${format(value)}</strong><p>${label}</p></div></article>`).join('');
+ $('#stats').innerHTML=[['▤',count,'Total sampel'],['♙',list.length,'Nama fasyankes di Excel'],['▦',validated,'Status Validated'],['✓',count-validated,'Verified / Finished']].map(([icon,value,label])=>`<article class="stat"><span class="stat-icon">${icon}</span><div><strong class="count-up" data-count="${value}">${format(value)}</strong><p>${label}</p></div></article>`).join('');
  $('#priority-list').innerHTML=list.filter(f=>f.risk==='Tinggi').slice(0,4).map(f=>`<button class="facility-row" data-id="${f.id}"><span class="facility-symbol">♙</span><span><strong>${escapeHTML(f.name)}</strong><small>${f.samples} sampel · rerata TSH ${f.mean.toFixed(2).replace('.',',')}</small></span>${badge(f.risk)}<span class="chevron">›</span></button>`).join('')||'<p class="section-description">Tidak ada fasilitas dalam klaster tinggi pada periode ini.</p>';
  $('#period-note').textContent=$('#period').value==='all'?`${ResearchData.metadata.start} – ${ResearchData.metadata.end}`:$('#period').selectedOptions[0].text+' · tanggal sampling';
  renderMap();renderChart();renderTable();bindDetails();
  const score=v=>v===null?'Tidak terdefinisi':v.toFixed(4).replace('.',',');
  $('.chart-summary').innerHTML=`<span>Rerata TSH seluruh sampel<strong>${count?(list.reduce((n,f)=>n+f.sum,0)/count).toFixed(2).replace('.',','):'—'} <small>µU/mL</small></strong></span><span>TSH maksimum<strong>${list.length?Math.max(...list.map(f=>f.tsh)).toFixed(2).replace('.',','):'—'} <small>µU/mL</small></strong></span><span>Silhouette K-Means (seluruh fasyankes)<strong>${score(analysis.silhouette)}</strong></span><span>Silhouette DBSCAN tanpa noise<strong>${score(analysis.dbscanSilhouette)}</strong><small>${analysis.dbscanClusters||0} klaster non-noise; perlu ≥2 klaster</small></span>`;
+ animateCounts();
 }
 
 function renderZoneSummary(){
@@ -48,7 +65,8 @@ function renderZoneSummary(){
   $('.zone-card h2').textContent=isDbscan?'Ringkasan anomali':'Ringkasan zonasi';
   $('.zone-card .subtle').textContent=isDbscan?'DBSCAN':'K-MEANS';
   $('.zone-card .section-description').textContent=isDbscan?'DBSCAN menentukan fasyankes yang pola datanya berbeda dari fasilitas lain.':'K-Means menentukan kelompok fasyankes yang data pemeriksaannya mirip.';
-  $('#zones').innerHTML=groups.map(g=>`<button class="zone-row" data-zone="${g.key}" style="--c:${g.color};--bg:${g.bg}"><span class="zone-indicator">${g.key==='Outlier'||g.key==='Tinggi'?'!':'⌖'}</span><span><strong>${g.label}</strong><small>${isDbscan?patternMeaning[g.key]:riskMeaning[g.key]}</small></span><b>${format(g.count)}</b></button>`).join('');
+  $('#zones').innerHTML=groups.map(g=>`<button class="zone-row" data-zone="${g.key}" style="--c:${g.color};--bg:${g.bg}"><span class="zone-indicator">${g.key==='Outlier'||g.key==='Tinggi'?'!':'⌖'}</span><span><strong>${g.label}</strong><small>${isDbscan?patternMeaning[g.key]:riskMeaning[g.key]}</small></span><b class="count-up" data-count="${g.count}">${format(g.count)}</b></button>`).join('');
+  animateCounts($('#zones'));
   $$('[data-zone]').forEach(b=>b.onclick=()=>{riskFilter=b.dataset.zone;$('#search').value='';navigate('data')});
   $('.zone-card .distribution-bar').innerHTML=groups.map(g=>`<i style="width:${list.length?g.count/list.length*100:0}%;background:${g.color}" title="${g.label}: ${format(g.count)}"></i>`).join('');
   $('.zone-card .insight-note p').innerHTML=isDbscan
