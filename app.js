@@ -217,30 +217,6 @@ function showDetail(id) {
   const meaning = { Rendah: 'lebih rendah', Sedang: 'berada di tengah', Tinggi: 'lebih tinggi' };
   const locationNote = Number.isFinite(f.lat) ? (f.sourceTitle === 'CSV pengguna' ? 'Lokasi ini berasal dari file yang Anda unggah dan hanya digunakan selama halaman ini dibuka.' : 'Titik peta menunjukkan lokasi fasilitas menurut sumber yang tercantum di bawah. Lokasinya belum diperiksa langsung dan mungkin sudah berubah.') : 'Lokasi fasilitas ini belum dapat dipastikan, sehingga belum ditampilkan di peta.';
   showDialog(`<span class="eyebrow">INFORMASI FASILITAS KESEHATAN</span><h2>${escapeHTML(f.name)}</h2><p>Periode pemeriksaan: ${escapeHTML($('#period').selectedOptions[0].text)}</p>${badge(f.risk)}<div class="detail-box"><strong>Ringkasan pemeriksaan</strong><div class="detail-line"><span>Jumlah sampel yang diperiksa</span><strong>${f.samples}</strong></div><div class="detail-line"><span>Nilai TSH rata-rata</span><strong>${f.mean.toFixed(2).replace('.', ',')} µU/mL</strong></div><div class="detail-line"><span>Nilai TSH paling tinggi</span><strong>${f.tsh.toFixed(2).replace('.', ',')} µU/mL</strong></div><div class="detail-line"><span>Kemiripan data</span><strong>${f.outlier ? 'Berbeda dari kelompok umum' : 'Mirip dengan fasilitas lain'}</strong></div><p>TSH adalah nama nilai pemeriksaan yang tercatat dalam data penelitian. µU/mL adalah satuan nilainya. Jumlah sampel belum tentu sama dengan jumlah bayi.</p></div><div class="detail-box"><strong>Mengapa masuk kategori ${f.risk.toLowerCase()}?</strong><p>Aplikasi membandingkan tiga hal: jumlah sampel, nilai TSH rata-rata, dan nilai TSH paling tinggi. Ketiganya diperhitungkan bersama dan diberi bobot yang sama.</p><p>Fasilitas ini masuk kelompok yang hasil gabungannya ${meaning[f.risk]} dibanding kelompok lain pada periode yang dipilih. Jadi, kategori tidak ditentukan oleh satu nilai TSH saja.</p><p>Kategori rendah, sedang, dan tinggi menunjukkan perbandingan data antarfasilitas. Kategori ini bukan penilaian bahwa bayi sehat atau sakit.</p></div><div class="detail-box"><strong>Apa arti kemiripan data?</strong><p>${f.outlier ? 'Data fasilitas ini cukup berbeda dari kelompok fasilitas lain. Pada tabel, hasil ini disebut “Outlier”. Perbedaannya dapat ditinjau lebih lanjut melalui jumlah sampel dan nilai pemeriksaannya.' : 'Data fasilitas ini memiliki pola yang mirip dengan fasilitas lain. Pada tabel, hasil ini disebut “Normal”. Kata normal di sini berarti pola datanya mirip, bukan berarti semua hasil pemeriksaan bayi normal.'}</p><p>Kategori “Tinggi” dan pola “Normal” bisa muncul bersamaan: fasilitas berada dalam kelompok dengan hasil gabungan lebih tinggi, tetapi polanya masih mirip dengan fasilitas lain.</p></div><div class="detail-box"><strong>Lokasi fasilitas</strong><p>${escapeHTML(f.matchedName || f.name)} · ${escapeHTML(f.area)}</p><p>${locationNote}</p>${f.matchedName && f.matchedName !== f.name ? '<p>Nama pada data penelitian dicocokkan dengan nama fasilitas di atas. Titik menunjukkan lokasi fasilitas secara keseluruhan, bukan ruang pelayanan tertentu.</p>' : ''}${f.name === 'PUSKESMAS NAGRAK' ? '<p>Ada informasi rencana pindah lokasi pada Mei 2026. Titik saat ini masih mengikuti sumber tahun 2023.</p>' : ''}${/^https:\/\//.test(f.sourceUrl || '') ? `<a href="${escapeHTML(f.sourceUrl)}" target="_blank" rel="noopener">Lihat sumber lokasi: ${escapeHTML(f.sourceTitle)}</a>` : ''}</div><p>Seluruh catatan pemeriksaan pada periode ini disertakan. Nama dan identitas pasien tidak ditampilkan.</p><details class="detail-box"><summary>Penjelasan teknis untuk penelitian</summary><p>K-Means mengelompokkan tiga nilai pemeriksaan setelah penyetaraan skala (z-score). Urutan rendah–tinggi mengikuti rata-rata pusat kelompok dengan bobot sama; aturan penamaan ini ditetapkan di aplikasi. DBSCAN mencari kemiripan pola dengan ε = 0,8 dan minPts = 3, termasuk titik sendiri.</p><a href="RESEARCH.md" target="_blank" rel="noopener">Baca metode dan batasan penelitian</a></details>`);
-
-}
-
-function showDetail(id) {
-  const f = facilities.find(f => f.id === id); if (!f) return;
-  const locationText = Number.isFinite(f.lat)
-    ? (f.sourceTitle ? escapeHTML(f.sourceTitle) : 'Koordinat fasilitas tersedia untuk dipetakan.')
-    : 'Lokasi fasilitas belum tersedia untuk ditampilkan di peta.';
-
-  showDialog(`<span class="eyebrow">INFORMASI FASILITAS KESEHATAN</span>
-    <h2>${escapeHTML(f.name)}</h2>
-    <p>Periode pemeriksaan: ${escapeHTML($('#period').selectedOptions[0].text)}</p>
-    ${badge(f.risk)}
-    <div class="detail-box">
-      <strong>Ringkasan</strong>
-      <div class="detail-line"><span>Jumlah sampel</span><strong>${f.samples}</strong></div>
-      <div class="detail-line"><span>TSH rata-rata</span><strong>${f.mean.toFixed(2).replace('.', ',')} µU/mL</strong></div>
-      <div class="detail-line"><span>TSH tertinggi</span><strong>${f.tsh.toFixed(2).replace('.', ',')} µU/mL</strong></div>
-      <div class="detail-line"><span>Status data</span><strong>${f.outlier ? 'Outlier' : 'Normal'}</strong></div>
-    </div>
-    <div class="detail-box">
-      <strong>Sumber lokasi</strong>
-      <p>${locationText}</p>
-    </div>`);
 }
 
 function methodology() {
