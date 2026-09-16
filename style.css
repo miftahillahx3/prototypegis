@@ -1,3 +1,6 @@
+/* Keep the back-to-top control clear of bottom navigation and page edge. */
+.scroll-top{bottom:82px}
+@media(max-width:600px){.scroll-top{bottom:126px}}
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
 body:has(#startup-loader:not(.is-done)){overflow:hidden}
 #startup-loader{position:fixed;inset:0;z-index:100;background:#091c32;color:#eaf5ff;display:grid;place-items:center;align-content:center;gap:18px;transition:opacity .65s ease,visibility .65s ease}
