@@ -231,18 +231,17 @@ function showDetail(id) {
 }
 
 let introMap;
+const westJavaBounds = [[-7.85, 105.20], [-5.50, 108.85]];
 function ensureIntroMap() {
   const container = $('#intro-map');
   if (!container || !window.L) return;
   if (introMap) { introMap.invalidateSize(); return; }
-  introMap = L.map(container, { zoomControl: true, attributionControl: true, scrollWheelZoom: false, dragging: true, doubleClickZoom: true, minZoom: 9, maxZoom: 16 });
+  introMap = L.map(container, { zoomControl: true, attributionControl: true, scrollWheelZoom: true, wheelPxPerZoomLevel: 90, touchZoom: true, dragging: true, doubleClickZoom: true, minZoom: 7, maxZoom: 16 });
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap contributors' }).addTo(introMap);
   const mapped = facilities.filter(f => Number.isFinite(f.lat) && Number.isFinite(f.lng));
   const markers = mapped.map(f => L.circleMarker([f.lat, f.lng], { radius: 6, color: '#fff', weight: 2, fillColor: colors[f.risk] || '#188ef1', fillOpacity: .92 }).bindPopup(`<strong>${escapeHTML(f.matchedName || f.name)}</strong><br>${escapeHTML(f.risk || 'Profil fasyankes')}`));
   markers.forEach(marker => marker.addTo(introMap));
-  const bounds = markers.map(marker => marker.getLatLng());
-  if (bounds.length) introMap.fitBounds(L.latLngBounds(bounds), { padding: [35, 35], maxZoom: 11, animate: false });
-  else introMap.setView([-6.82, 107.14], 10);
+  introMap.fitBounds(westJavaBounds, { padding: [12, 12], animate: false });
 }
 function methodology() {
   let dialog = $('#intro-dialog');
