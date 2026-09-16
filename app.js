@@ -237,11 +237,14 @@ function methodology() {
     dialog.id = 'intro-dialog';
     dialog.setAttribute('aria-labelledby', 'intro-title');
     dialog.innerHTML = `<button class="dialog-close" id="intro-close" aria-label="Tutup pengantar">×</button>
-      <div class="intro-heading"><span class="eyebrow">SELAMAT DATANG DI SBBL JAWA BARAT</span><h2 id="intro-title" tabindex="-1">Dari laporan data,<br><span>menjadi informasi yang mudah dipahami.</span></h2></div>
-      <section class="intro-conclusion"><p>Aplikasi membantu membandingkan data pemeriksaan antar fasilitas kesehatan di Kabupaten Cianjur.</p><p><strong>Kategori rendah, sedang, dan tinggi</strong> dibuat dari gabungan jumlah sampel, nilai TSH rata-rata, dan nilai TSH paling tinggi. Kategori ini merupakan perbandingan data, bukan penilaian kesehatan bayi.</p><p><strong>Pola “Normal”</strong> berarti data mirip dengan fasilitas lain. <strong>“Outlier”</strong> berarti polanya berbeda dari kelompok umum. Karena itu, kategori tinggi tetap bisa memiliki pola normal.</p></section>
-      <div class="intro-simulation">Data berasal dari ${ResearchData.metadata.records} pemeriksaan dengan ${ResearchData.metadata.facilities} nama fasilitas dalam Excel. Beberapa nama merujuk pada fasilitas yang sama. Saat periode diganti, aplikasi menghitung kembali hasilnya. Titik peta memakai lokasi fasilitas dari sumber publik; nama yang lokasinya belum pasti belum ditampilkan. Buka detail fasilitas untuk melihat angka pemeriksaan, penjelasan kategori, dan sumber lokasi.</div>
-      <details class="detail-box"><summary>Metode penelitian lebih lanjut</summary><p>Pengelompokan memakai K-Means, sedangkan pemeriksaan kemiripan memakai DBSCAN. Keduanya membandingkan data pemeriksaan, bukan jarak lokasi di peta.</p><a href="RESEARCH.md" target="_blank" rel="noopener">Baca pengaturan perhitungan dan batasan data</a></details>
-      <div class="intro-actions"><button class="primary-button" id="intro-start">Mulai jelajahi dashboard <span>→</span></button><small>Bisa dibaca kembali melalui tombol ⓘ atau Pahami cara membaca peta.</small></div>`;
+      <div class="intro-heading"><span class="eyebrow">PENGANTAR PENELITIAN · SBBL JAWA BARAT</span><h2 id="intro-title" tabindex="-1">Mengapa TSH<br><span>perlu dipetakan?</span></h2><p class="intro-lead">Memahami sinyal awal untuk membantu perhatian yang lebih tepat pada layanan pemeriksaan bayi baru lahir.</p></div>
+      <section class="intro-story">
+        <article class="intro-story-card intro-story-focus"><span class="intro-card-index">01</span><div class="intro-story-icon">⌁</div><h3>TSH sebagai sinyal awal</h3><p>TSH merupakan parameter penting pada bayi baru lahir. Hasilnya berkaitan dengan risiko gangguan pertumbuhan dan disabilitas intelektual, sehingga perlu diketahui sedini mungkin.</p></article>
+        <article class="intro-story-card intro-story-action"><span class="intro-card-index">02</span><div class="intro-story-icon">◌</div><h3>Dari data menjadi perhatian</h3><p>Penelitian ini memetakan fasyankes dengan rerata TSH yang tinggi dan jumlah pemeriksaan yang banyak. Informasi tersebut membantu pembuat kebijakan menentukan prioritas perhatian dan merencanakan distribusi logistik.</p></article>
+        <article class="intro-story-card intro-story-map"><span class="intro-card-index">03</span><div class="intro-story-icon">⌖</div><h3>Mengapa menggunakan GIS?</h3><p>Geographic Information System membantu mengubah data pemeriksaan menjadi visualisasi ruang, sehingga pola antarwilayah lebih mudah dilihat, dibandingkan, dan ditindaklanjuti.</p></article>
+      </section>
+      <div class="intro-footer-note"><span class="live-dot"></span><span>Eksplorasi data penelitian berbasis lokasi</span><b>${ResearchData.metadata.facilities} fasyankes · ${ResearchData.metadata.records} pemeriksaan</b></div>
+      <div class="intro-actions"><button class="primary-button" id="intro-start">Masuk ke dashboard <span>→</span></button><small>Visualisasi ini mendukung perencanaan program, bukan diagnosis klinis.</small></div>`;
     document.body.appendChild(dialog);
     const close = () => dialog.close();
     $('#intro-close').onclick = close; $('#intro-start').onclick = close;
@@ -256,5 +259,21 @@ $('#region').innerHTML = '<option value="all">Seluruh fasyankes</option>'; $('#r
 customSelect($('#period')); customSelect($('#region')); customSelect($('#kmeans-filter')); customSelect($('#dbscan-filter'));
 $('#kmeans-filter').onchange = () => { tablePage = 1; $('#dbscan-filter').value = 'Semua'; renderTable() }; $('#dbscan-filter').onchange = () => { tablePage = 1; $('#kmeans-filter').value = 'Semua'; renderTable() };
 page = navItems.some(n => n[0] === location.hash.slice(1)) ? location.hash.slice(1) : 'beranda'; renderPage();
+
+const scrollTopButton = $('#scroll-top');
+if (scrollTopButton) {
+  const updateScrollTop = () => scrollTopButton.classList.toggle('is-visible', window.scrollY > window.innerHeight * .65);
+  window.addEventListener('scroll', updateScrollTop, { passive: true });
+  updateScrollTop();
+  scrollTopButton.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+const startupLoader = $('#startup-loader');
+if (startupLoader) {
+  window.setTimeout(() => {
+    startupLoader.classList.add('is-done');
+    window.setTimeout(() => methodology(), 420);
+  }, 1450);
+}
 
 

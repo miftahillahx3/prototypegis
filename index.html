@@ -2,6 +2,13 @@
 <html lang="id">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#087af5"><title>SBBL Jawa Barat · Observatorium Neonatal</title><meta name="description" content="Prototipe penelitian kerentanan neonatal Jawa Barat: peta interaktif, visualisasi K-Means dan DBSCAN, serta statistik fasyankes menggunakan data penelitian."><meta name="referrer" content="strict-origin-when-cross-origin"><link rel="stylesheet" href="vendor/leaflet/leaflet.css"><link rel="stylesheet" href="style.css?v=20260916-marker-modal"></head>
 <body>
+<div id="startup-loader" aria-label="Memuat aplikasi" role="status">
+	<div class="loader-core"><span></span><span></span><span></span></div>
+	<div class="loader-brand">SBBL <b>JAWA BARAT</b></div>
+	<p>MEMUAT RUANG ANALISIS</p>
+	<div class="loader-progress"><i></i></div>
+</div>
+<button class="scroll-top" id="scroll-top" type="button" aria-label="Kembali ke bagian atas" title="Kembali ke atas"><span>↑</span></button>
 <aside class="sidebar"><a class="brand" href="#beranda"><span class="logo">◕</span><span>SBBL<span class="brand-sub">JAWA BARAT</span></span></a><div class="workspace">WORKSPACE PENELITIAN</div><nav id="side-nav"></nav><div class="side-bottom"><div class="live-dot"></div> Prototipe penelitian<span>Hybrid Spatial Clustering · v1.0</span></div></aside>
 <div class="app"><header><div class="mobile-brand"><span class="logo">◕</span><strong>SBBL Jawa Barat</strong></div><div class="breadcrumb">Observatorium neonatal <span>/</span> <strong id="crumb">Ringkasan wilayah</strong></div><div class="header-right"><span class="demo-label">DATA PENELITIAN</span><button class="icon-button" id="info-button" aria-label="Tentang aplikasi">ⓘ</button><div class="avatar">PR</div></div></header>
 <main><section class="page-heading"><div><div class="eyebrow"><span></span> SKRINING BAYI BARU LAHIR</div><h1 id="page-title">Setiap awal kehidupan,<br><span>layak mendapat perhatian.</span></h1><p id="page-desc">Eksplorasi kerentanan neonatal di Jawa Barat melalui hybrid spatial clustering.</p></div><button class="export-button" id="export">↓ <span>Ekspor data</span></button></section>
