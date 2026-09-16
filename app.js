@@ -238,12 +238,23 @@ function methodology() {
     dialog.setAttribute('aria-labelledby', 'intro-title');
     dialog.innerHTML = `<button class="dialog-close" id="intro-close" aria-label="Tutup pengantar">×</button>
       <div class="intro-heading"><span class="eyebrow">PENGANTAR PENELITIAN · SBBL JAWA BARAT</span><h2 id="intro-title" tabindex="-1">Mengapa TSH<br><span>perlu dipetakan?</span></h2><p class="intro-lead">Memahami sinyal awal untuk membantu perhatian yang lebih tepat pada layanan pemeriksaan bayi baru lahir.</p></div>
-      <section class="intro-story">
-        <article class="intro-story-card intro-story-focus"><span class="intro-card-index">01</span><div class="intro-story-icon">⌁</div><h3>TSH sebagai sinyal awal</h3><p>TSH merupakan parameter penting pada bayi baru lahir. Hasilnya berkaitan dengan risiko gangguan pertumbuhan dan disabilitas intelektual, sehingga perlu diketahui sedini mungkin.</p></article>
-        <article class="intro-story-card intro-story-action"><span class="intro-card-index">02</span><div class="intro-story-icon">◌</div><h3>Dari data menjadi perhatian</h3><p>Penelitian ini memetakan fasyankes dengan rerata TSH yang tinggi dan jumlah pemeriksaan yang banyak. Informasi tersebut membantu pembuat kebijakan menentukan prioritas perhatian dan merencanakan distribusi logistik.</p></article>
-        <article class="intro-story-card intro-story-map"><span class="intro-card-index">03</span><div class="intro-story-icon">⌖</div><h3>Mengapa menggunakan GIS?</h3><p>Geographic Information System membantu mengubah data pemeriksaan menjadi visualisasi ruang, sehingga pola antarwilayah lebih mudah dilihat, dibandingkan, dan ditindaklanjuti.</p></article>
+      <section class="intro-visual-layout">
+        <div class="intro-map-preview" aria-label="Ilustrasi visualisasi peta penelitian">
+          <div class="preview-grid"></div><div class="preview-land preview-land-one"></div><div class="preview-land preview-land-two"></div>
+          <span class="preview-label preview-label-one">Cianjur</span><span class="preview-label preview-label-two">Fasyankes</span><span class="preview-label preview-label-three">TSH tinggi</span>
+          <i class="preview-point point-one"></i><i class="preview-point point-two"></i><i class="preview-point point-three"></i><i class="preview-point point-four"></i><i class="preview-point point-five"></i>
+          <div class="preview-callout"><b>Rerata TSH</b><strong>Profil wilayah</strong><small>Visualisasi spasial</small></div><div class="preview-legend"><span><i></i> Rendah</span><span><i></i> Sedang</span><span><i></i> Tinggi</span></div>
+          <div class="preview-tools"><button type="button" aria-label="Perbesar">+</button><button type="button" aria-label="Perkecil">−</button></div>
+        </div>
+        <aside class="intro-impact"><span class="intro-impact-kicker">ALUR PENELITIAN & DAMPAK</span>
+          <div class="impact-step"><b>01</b><span class="impact-icon">⌁</span><p><strong>TSH adalah indikator kunci</strong> kesehatan bayi baru lahir. Deteksi dini sangat krusial.</p></div>
+          <div class="impact-line"></div>
+          <div class="impact-step"><b>02</b><span class="impact-icon">⇄</span><p>Penelitian ini memetakan fasyankes dengan rerata TSH yang tinggi dan jumlah pemeriksaan yang banyak. Informasi tersebut membantu pembuat kebijakan menentukan prioritas perhatian dan merencanakan distribusi logistik.</p></div>
+          <div class="impact-line"></div>
+          <div class="impact-step"><b>03</b><span class="impact-icon">◉</span><p>Geographic Information System membantu mengubah data pemeriksaan menjadi visualisasi ruang, sehingga pola antarwilayah lebih mudah dilihat, dibandingkan, dan ditindaklanjuti.</p></div>
+        </aside>
       </section>
-      <div class="intro-footer-note"><span class="live-dot"></span><span>Eksplorasi data penelitian berbasis lokasi</span><b>${ResearchData.metadata.facilities} fasyankes · ${ResearchData.metadata.records} pemeriksaan</b></div>
+      <div class="intro-footer-note"><span>Total fasyankes: <b>${ResearchData.metadata.facilities}</b></span><em></em><span>Total pemeriksaan: <b>${ResearchData.metadata.records}</b></span><em></em><span>Analisis berbasis lokasi</span></div>
       <div class="intro-actions"><button class="primary-button" id="intro-start">Masuk ke dashboard <span>→</span></button><small>Visualisasi ini mendukung perencanaan program, bukan diagnosis klinis.</small></div>`;
     document.body.appendChild(dialog);
     const close = () => dialog.close();
