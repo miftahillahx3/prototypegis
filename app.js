@@ -266,7 +266,7 @@ function methodology() {
         </aside>
       </section>
       <div class="intro-footer-note"><span>Total fasyankes: <b>${ResearchData.metadata.facilities}</b></span><em></em><span>Total pemeriksaan: <b>${ResearchData.metadata.records}</b></span><em></em><span>Analisis berbasis lokasi</span></div>
-      <div class="intro-actions"><button class="primary-button" id="intro-start">Masuk ke dashboard <span>→</span></button><small>Visualisasi ini mendukung perencanaan program, bukan diagnosis klinis.</small></div>`;
+      <div class="intro-actions"><button class="primary-button" id="intro-start"><span class="button-label">Masuk ke dashboard</span><span>→</span></button><small>Visualisasi ini mendukung perencanaan program, bukan diagnosis klinis.</small></div>`;
     document.body.appendChild(dialog);
     const close = () => dialog.close();
     $('#intro-close').onclick = close; $('#intro-start').onclick = close;
